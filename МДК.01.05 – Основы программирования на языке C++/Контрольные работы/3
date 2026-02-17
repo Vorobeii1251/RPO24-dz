@@ -1,0 +1,37 @@
+
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <numeric>
+
+int main() {
+    // Создаем файл и записываем числа
+    std::ofstream outFile("numbers.txt");
+    if (!outFile) {
+        std::cerr << "Не удалось открыть файл для записи." << std::endl;
+        return 1;
+    }
+    outFile << 10 << " " << 20 << " " << 30 << " " << 40 << " " << 50 << std::endl;
+    outFile.close();
+
+    // Читаем числа из файла
+    std::ifstream inFile("numbers.txt");
+    if (!inFile) {
+        std::cerr << "Не удалось открыть файл для чтения." << std::endl;
+        return 1;
+    }
+
+    std::vector<int> numbers;
+    int num;
+    while (inFile >> num) {
+        numbers.push_back(num);
+    }
+
+    // Находим среднее значение
+    double sum = std::accumulate(numbers.begin(), numbers.end(), 0);
+    double average = sum / numbers.size();
+
+    std::cout << "Среднее значение: " << average << std::endl;
+
+    return 0;
+}
