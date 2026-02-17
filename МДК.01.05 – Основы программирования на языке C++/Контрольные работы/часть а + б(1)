@@ -1,0 +1,52 @@
+/*Часть А: Теория
+
+1) Разница между std::vector и обычным массивом
+Обычный массив имеет фиксированный размер, выделенный статически/динамически, без автоуправления памятью и встроенных методов.
+std::vector: динамическая емкость, поддержка многих операций управления размером, безопасность границ и эффективность работы.
+
+2)Использование std::string_view и std::string
+std::string_view: минимизирует затраты на выделение памяти, используется для чтения строк без изменений.
+std::string: применяется, когда нужны операции модификации строки.
+
+3)Отличия system_clock и steady_clock
+system_clock: отражает текущее время системы, подвержено изменениям часов.
+steady_clock: обеспечивает строгий порядок времени, идеально для измерения промежутков.
+
+4)Исключение (throw) и std::optional
+Исключение: для критичных проблем, нарушающих работу программы.
+std::optional: опциональный возврат результата, когда отсутствие значения допустимо.
+
+5)Этапы компиляции C++
+Пре-процессор → 2. Компиляция → 3. Ассемблирование → 4. Связывание → 5. Исполнение.
+*/
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <set>
+#include <algorithm>
+
+int main() {
+    std::string input = "apple,banana,orange,apple,kiwi";
+
+    std::vector<std::string> words;
+    size_t start = 0, end;
+    while ((end = input.find(',', start)) != std::string::npos) {
+        words.push_back(input.substr(start, end - start));
+        start = end + 1;
+    }
+    words.push_back(input.substr(start));
+
+    std::set<std::string> uniqueWords(words.begin(), words.end());
+
+    std::vector<std::string> result(uniqueWords.begin(), uniqueWords.end());
+
+    std::sort(result.begin(), result.end());
+
+    for (const auto& word : result) {
+        std::cout << word << " ";
+    }
+    std::cout << std::endl;
+
+    return 0;
+}
