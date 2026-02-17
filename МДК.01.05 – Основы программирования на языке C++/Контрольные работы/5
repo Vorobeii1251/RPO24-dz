@@ -1,0 +1,33 @@
+#include <iostream>
+#include <string>
+#include <stdexcept>
+
+int main() {
+    try {
+        std::cout << "Введите число: ";
+        std::string input;
+        std::cin >> input;
+
+        size_t pos;
+        int number;
+        try {
+            number = std::stoi(input, &pos);
+        } catch (const std::invalid_argument&) {
+            throw std::runtime_error("Введено не число");
+        }
+
+        if (pos != input.length()) {
+            throw std::runtime_error("Введено не число");
+        }
+
+        if (number < 0) {
+            throw std::runtime_error("Число отрицательное");
+        }
+
+        std::cout << "Введенное число: " << number << std::endl;
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Ошибка: " << e.what() << std::endl;
+    }
+
+    return 0;
+}
