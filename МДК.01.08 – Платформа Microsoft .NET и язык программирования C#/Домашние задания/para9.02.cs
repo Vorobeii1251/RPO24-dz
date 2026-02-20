@@ -21,7 +21,7 @@ namespace c_
                 {"Arrow", 10}
             };
 
-            gold = 500; // Начальное золото игрока
+            gold = 500;
             inventory = new List<string>();
         }
 
@@ -50,7 +50,7 @@ namespace c_
                         SellItem();
                         break;
                     case "5":
-                        ManageShop(); // Админ-меню
+                        ManageShop(); 
                         break;
                     case "6":
                         Console.WriteLine("\nСпасибо за игру");
@@ -446,4 +446,5 @@ namespace c_
             shop.Run();
         }
     }
+
 }
