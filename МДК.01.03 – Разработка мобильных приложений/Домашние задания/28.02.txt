@@ -1,0 +1,134 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: FirstScreen(),
+    );
+  }
+}
+
+class FirstScreen extends StatefulWidget {
+  const FirstScreen({super.key});
+
+  @override
+  State<FirstScreen> createState() => _FirstScreenState();
+}
+
+class _FirstScreenState extends State<FirstScreen> {
+  final TextEditingController controller = TextEditingController(text: 'Валера молодец');
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Экран 1: Ввод строки')),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text('Текст для передачи'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: controller,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SecondScreen(text: controller.text),
+                  ),
+                );
+              },
+              child: const Text('Перейти на Экран 2'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SecondScreen extends StatefulWidget {
+  final String text;
+  const SecondScreen({super.key, required this.text});
+
+  @override
+  State<SecondScreen> createState() => _SecondScreenState();
+}
+
+class _SecondScreenState extends State<SecondScreen> {
+  final List<Color> colors = [Colors.red, Colors.green, Colors.blue];
+  late Color textColor;
+  Color bgColor = Colors.white;
+
+  @override
+  void initState() {
+    super.initState();
+    textColor = colors[DateTime.now().millisecond % colors.length];
+    bgColor = textColor;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Экран 2: Выбор цвета')),
+      body: Container(
+        color: bgColor,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                widget.text,
+                style: TextStyle(fontSize: 32, color: textColor),
+              ),
+              const SizedBox(height: 50),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildColorButton(Colors.red, 'Красный', 0),
+                  const SizedBox(width: 20),
+                  _buildColorButton(Colors.green, 'Зеленый', 1),
+                  const SizedBox(width: 20),
+                  _buildColorButton(Colors.blue, 'Синий', 2),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorButton(Color color, String label, int index) {
+    return Column(
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => setState(() => bgColor = colors[index]),
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(color: Colors.white)),
+      ],
+    );
+  }
+}
