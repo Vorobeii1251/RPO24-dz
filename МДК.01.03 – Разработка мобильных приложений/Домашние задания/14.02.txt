@@ -1,0 +1,105 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Like Button Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const LikeButtonScreen(),
+    );
+  }
+}
+
+class LikeButtonScreen extends StatelessWidget {
+  const LikeButtonScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Like Button'),
+        centerTitle: true,
+      ),
+      body: const Center(
+        child: LikeButton(),
+      ),
+    );
+  }
+}
+
+class LikeButton extends StatefulWidget {
+  const LikeButton({super.key});
+
+  @override
+  State<LikeButton> createState() => _LikeButtonState();
+}
+
+class _LikeButtonState extends State<LikeButton> {
+  bool _isLiked = false;
+  int _likeCount = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: _toggleLike,
+                child: Icon(
+                  _isLiked ? Icons.favorite : Icons.favorite_border,
+                  color: _isLiked ? Colors.red : Colors.grey,
+                  size: 32,
+                ),
+              ),
+              const SizedBox(width: 8),
+              
+              Text(
+                '$_likeCount',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: _isLiked ? Colors.red : Colors.grey[700],
+                ),
+              ),
+            ],
+          ),
+        ),
+        
+        const SizedBox(height: 20),
+        
+        Text(
+          'Статус: ${_isLiked ? "Лайкнут ❤️" : "Не лайкнут 🤍"}',
+          style: const TextStyle(fontSize: 16),
+        ),
+      ],
+    );
+  }
+
+  void _toggleLike() {
+    setState(() {
+      if (_isLiked) {
+        _isLiked = false;
+        _likeCount = 0;
+      } else {
+        _isLiked = true;
+        _likeCount = 1;
+      }
+    });
+  }
+}
