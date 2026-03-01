@@ -1,0 +1,216 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(const MyApp());
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Навигация',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = const [
+    HomePage(),
+    SearchPage(),
+    ProfilePage(),
+  ];
+
+  final List<String> _titles = ['Главная', 'Поиск', 'Профиль'];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_titles[_currentIndex]),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Главная'),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Поиск'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Профиль'),
+        ],
+      ),
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
+  final List<Map<String, String>> items = const [
+    {'title': 'Элемент 1', 'subtitle': 'Описание элемента 1. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 2', 'subtitle': 'Описание элемента 2. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 3', 'subtitle': 'Описание элемента 3. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 4', 'subtitle': 'Описание элемента 4. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 5', 'subtitle': 'Описание элемента 5. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 6', 'subtitle': 'Описание элемента 6. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 7', 'subtitle': 'Описание элемента 7. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 8', 'subtitle': 'Описание элемента 8. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 9', 'subtitle': 'Описание элемента 9. Здесь может быть более длинный текст для демонстрации.'},
+    {'title': 'Элемент 10', 'subtitle': 'Описание элемента 10. Здесь может быть более длинный текст для демонстрации.'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: items.length,
+      padding: const EdgeInsets.all(8),
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+          elevation: 4,
+          shadowColor: Colors.blue.withOpacity(0.3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: ListTile(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            leading: CircleAvatar(
+              radius: 24,
+              backgroundColor: Colors.blue.shade100,
+              child: Text(
+                '${index + 1}',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+            title: Text(
+              item['title']!,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text(
+                item['subtitle']!,
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ),
+            trailing: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                Icons.arrow_forward_ios,
+                size: 16,
+                color: Colors.blue,
+              ),
+            ),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Нажат ${item['title']}'),
+                  backgroundColor: Colors.blue,
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+class SearchPage extends StatefulWidget {
+  const SearchPage({super.key});
+
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  final TextEditingController _controller = TextEditingController();
+
+  void _showSearchDialog() {
+    String query = _controller.text.trim();
+    if (query.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Введите запрос')),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Поиск'),
+        content: Text('Вы ищете: "$query"'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          TextField(
+            controller: _controller,
+            decoration: InputDecoration(
+              labelText: 'Поисковый запрос',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              prefixIcon: const Icon(Icons.search),
+            ),
+          ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _showSearchDialog,
+            child: const Text('Искать'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Text('Профиль пользователя', style: TextStyle(fontSize: 24)),
+    );
+  }
+}
