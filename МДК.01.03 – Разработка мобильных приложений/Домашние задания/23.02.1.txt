@@ -1,0 +1,365 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Регистрация',
+      theme: ThemeData(
+        primarySwatch: Colors.deepPurple,
+        useMaterial3: true,
+      ),
+      home: const RegistrationScreen(),
+    );
+  }
+}
+
+class RegistrationScreen extends StatefulWidget {
+  const RegistrationScreen({super.key});
+
+  @override
+  State<RegistrationScreen> createState() => _RegistrationScreenState();
+}
+
+class _RegistrationScreenState extends State<RegistrationScreen> {
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
+  
+  String _successMessage = '';
+
+  @override
+  void dispose() {
+    _loginController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  String? _validateLogin(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Логин не может быть пустым';
+    }
+    
+    if (value.length < 4) {
+      return 'Логин должен содержать минимум 4 символа';
+    }
+    if (value.length > 15) {
+      return 'Логин не должен превышать 15 символов';
+    }
+    
+    final RegExp validChars = RegExp(r'^[a-zA-Z0-9]+$');
+    if (!validChars.hasMatch(value)) {
+      return 'Логин может содержать только буквы и цифры';
+    }
+    
+    final RegExp hasLetter = RegExp(r'[a-zA-Z]');
+    if (!hasLetter.hasMatch(value)) {
+      return 'Логин должен содержать хотя бы одну букву';
+    }
+    
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Пароль не может быть пустым';
+    }
+    
+    if (value.length < 8) {
+      return 'Пароль должен содержать минимум 8 символов';
+    }
+    if (value.length > 20) {
+      return 'Пароль не должен превышать 20 символов';
+    }
+    
+    final RegExp hasUppercase = RegExp(r'[A-Z]');
+    if (!hasUppercase.hasMatch(value)) {
+      return 'Пароль должен содержать хотя бы одну заглавную букву';
+    }
+    
+    final RegExp hasLowercase = RegExp(r'[a-z]');
+    if (!hasLowercase.hasMatch(value)) {
+      return 'Пароль должен содержать хотя бы одну строчную букву';
+    }
+    
+    final RegExp hasDigit = RegExp(r'[0-9]');
+    if (!hasDigit.hasMatch(value)) {
+      return 'Пароль должен содержать хотя бы одну цифру';
+    }
+    
+    final RegExp hasSpecial = RegExp(r'[!@#$%^&*(),.?":{}|<>]');
+    if (!hasSpecial.hasMatch(value)) {
+      return 'Пароль должен содержать хотя бы один специальный символ';
+    }
+    
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Подтвердите пароль';
+    }
+    if (value != _passwordController.text) {
+      return 'Пароли не совпадают';
+    }
+    return null;
+  }
+
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      setState(() {
+        _successMessage = 'Регистрация успешна! Добро пожаловать, ${_loginController.text}';
+      });
+      
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Успешно!'),
+          content: Text('Аккаунт ${_loginController.text} создан'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(ctx).pop();
+                _loginController.clear();
+                _passwordController.clear();
+                _confirmPasswordController.clear();
+                setState(() {
+                  _successMessage = '';
+                });
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.deepPurple[50],
+      appBar: AppBar(
+        title: const Text('Регистрация'),
+        centerTitle: true,
+        backgroundColor: Colors.deepPurple,
+        foregroundColor: Colors.white,
+        elevation: 0,
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.deepPurple,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.deepPurple.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.person_add,
+                  size: 50,
+                  color: Colors.white,
+                ),
+              ),
+              
+              const SizedBox(height: 30),
+              
+              const Text(
+                'Создать аккаунт',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+              ),
+              
+              const SizedBox(height: 10),
+              
+              const Text(
+                'Заполните форму для регистрации',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.grey,
+                ),
+              ),
+              
+              const SizedBox(height: 30),
+              
+              Form(
+                key: _formKey,
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _loginController,
+                        validator: _validateLogin,
+                        decoration: InputDecoration(
+                          labelText: 'Логин',
+                          hintText: 'Введите логин',
+                          prefixIcon: const Icon(Icons.person, color: Colors.deepPurple),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                          ),
+                          errorStyle: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      TextFormField(
+                        controller: _passwordController,
+                        validator: _validatePassword,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Пароль',
+                          hintText: 'Введите пароль',
+                          prefixIcon: const Icon(Icons.lock, color: Colors.deepPurple),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                              color: Colors.deepPurple,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                          ),
+                          errorStyle: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 16),
+                      
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        validator: _validateConfirmPassword,
+                        obscureText: !_isConfirmPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Подтверждение пароля',
+                          hintText: 'Повторите пароль',
+                          prefixIcon: const Icon(Icons.lock_outline, color: Colors.deepPurple),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                              color: Colors.deepPurple,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.deepPurple, width: 2),
+                          ),
+                          errorStyle: const TextStyle(color: Colors.red),
+                        ),
+                      ),
+                      
+                      const SizedBox(height: 24),
+                      
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: _submitForm,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.deepPurple,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            elevation: 3,
+                          ),
+                          child: const Text(
+                            'Зарегистрироваться',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              
+              const SizedBox(height: 20),
+              
+              if (_successMessage.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.green.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.green.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.check_circle, color: Colors.green.shade600),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          _successMessage,
+                          style: TextStyle(color: Colors.green.shade700),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
