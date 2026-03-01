@@ -1,0 +1,166 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'TextField Demo',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const TextFieldScreen(),
+    );
+  }
+}
+
+class TextFieldScreen extends StatefulWidget {
+  const TextFieldScreen({super.key});
+
+  @override
+  State<TextFieldScreen> createState() => _TextFieldScreenState();
+}
+
+class _TextFieldScreenState extends State<TextFieldScreen> {
+  final TextEditingController _nameController = TextEditingController();
+  
+  String _displayedName = '';
+  
+  bool _showGreeting = false;
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    super.dispose();
+  }
+
+  void _showName() {
+    setState(() {
+      _displayedName = _nameController.text;
+      _showGreeting = true;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('TextField и GetWidget'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Заголовок
+            const Center(
+              child: Text(
+                'TextField и GetWidget',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 30),
+            
+            const Text(
+              'Введите ваше имя',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey,
+              ),
+            ),
+            
+            const SizedBox(height: 8),
+            
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                hintText: 'Введите имя',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: Colors.blue, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+              ),
+              onSubmitted: (_) => _showName(),
+            ),
+            
+            const SizedBox(height: 16),
+            
+            Center(
+              child: ElevatedButton(
+                onPressed: _showName,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(200, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                child: const Text(
+                  'Показать имя',
+                  style: TextStyle(fontSize: 16),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 30),
+            
+            const Divider(
+              thickness: 1,
+              height: 30,
+            ),
+            
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.info_outline, color: Colors.blue),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _displayedName.isEmpty 
+                          ? 'Введенное имя: ' 
+                          : 'Введенное имя: $_displayedName',
+                      style: const TextStyle(
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+           
+          ],
+        ),
+      ),
+    );
+  }
+}
