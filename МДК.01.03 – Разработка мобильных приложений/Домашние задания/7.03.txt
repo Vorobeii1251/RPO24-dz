@@ -1,0 +1,371 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Редактор профиля',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      home: const ProfileScreen(),
+    );
+  }
+}
+
+// ==================== ГЛАВНЫЙ ЭКРАН (PROFILE SCREEN) ====================
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  // Начальные данные профиля
+  String _userName = 'Иван Петров';
+  String _userStatus = 'Flutter разработчик';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Мой профиль'),
+        centerTitle: true,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const SizedBox(height: 30),
+            
+            // Аватар пользователя
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.blue.shade100,
+                border: Border.all(color: Colors.blue, width: 3),
+              ),
+              child: const Icon(
+                Icons.person,
+                size: 60,
+                color: Colors.blue,
+              ),
+            ),
+            
+            const SizedBox(height: 30),
+            
+            // Карточка с информацией
+            Card(
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    // Имя
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline, color: Colors.blue),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Имя:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Text(
+                                _userName,
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const Divider(height: 30),
+                    
+                    // Статус
+                    Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.blue),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Статус:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              Text(
+                                _userStatus,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 40),
+            
+            // Кнопка редактирования
+            ElevatedButton.icon(
+              onPressed: _editProfile,
+              icon: const Icon(Icons.edit),
+              label: const Text(
+                'Редактировать профиль',
+                style: TextStyle(fontSize: 16),
+              ),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Метод для открытия экрана редактирования и ожидания результата
+  Future<void> _editProfile() async {
+    // Открываем экран редактирования и ждем результат
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditProfileScreen(
+          currentName: _userName,
+          currentStatus: _userStatus,
+        ),
+      ),
+    );
+
+    // Если данные вернулись, обновляем состояние
+    if (result != null && result is Map<String, String>) {
+      setState(() {
+        _userName = result['name'] ?? _userName;
+        _userStatus = result['status'] ?? _userStatus;
+      });
+      
+      // Показываем уведомление
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Профиль успешно обновлен!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+}
+
+// ==================== ЭКРАН РЕДАКТИРОВАНИЯ (EDIT PROFILE SCREEN) ====================
+class EditProfileScreen extends StatefulWidget {
+  final String currentName;
+  final String currentStatus;
+
+  const EditProfileScreen({
+    super.key,
+    required this.currentName,
+    required this.currentStatus,
+  });
+
+  @override
+  State<EditProfileScreen> createState() => _EditProfileScreenState();
+}
+
+class _EditProfileScreenState extends State<EditProfileScreen> {
+  // Контроллеры для текстовых полей
+  late TextEditingController _nameController;
+  late TextEditingController _statusController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Инициализируем контроллеры текущими значениями
+    _nameController = TextEditingController(text: widget.currentName);
+    _statusController = TextEditingController(text: widget.currentStatus);
+  }
+
+  @override
+  void dispose() {
+    // Освобождаем ресурсы
+    _nameController.dispose();
+    _statusController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Редактирование профиля'),
+        centerTitle: true,
+        backgroundColor: Colors.orange,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () {
+            // Отмена редактирования
+            Navigator.pop(context);
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            
+            // Поле ввода имени
+            TextField(
+              controller: _nameController,
+              decoration: InputDecoration(
+                labelText: 'Имя',
+                hintText: 'Введите ваше имя',
+                prefixIcon: const Icon(Icons.person_outline),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+            ),
+            
+            const SizedBox(height: 20),
+            
+            // Поле ввода статуса
+            TextField(
+              controller: _statusController,
+              decoration: InputDecoration(
+                labelText: 'Статус',
+                hintText: 'Введите ваш статус',
+                prefixIcon: const Icon(Icons.info_outline),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+              ),
+              maxLines: 3,
+            ),
+            
+            const SizedBox(height: 30),
+            
+            // Кнопка сохранения
+            ElevatedButton.icon(
+              onPressed: _saveProfile,
+              icon: const Icon(Icons.save),
+              label: const Text(
+                'Сохранить изменения',
+                style: TextStyle(fontSize: 16),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+            
+            const SizedBox(height: 10),
+            
+            // Кнопка отмены
+            TextButton.icon(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.cancel),
+              label: const Text('Отмена'),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Метод сохранения данных
+  void _saveProfile() {
+    // Получаем новые данные
+    String newName = _nameController.text.trim();
+    String newStatus = _statusController.text.trim();
+
+    // Валидация
+    if (newName.isEmpty) {
+      _showErrorDialog('Имя не может быть пустым');
+      return;
+    }
+
+    if (newStatus.isEmpty) {
+      _showErrorDialog('Статус не может быть пустым');
+      return;
+    }
+
+    // Создаем Map с новыми данными
+    Map<String, String> updatedData = {
+      'name': newName,
+      'status': newStatus,
+    };
+
+    // Возвращаем данные на предыдущий экран
+    Navigator.pop(context, updatedData);
+  }
+
+  // Диалог с ошибкой
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Ошибка'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+}
