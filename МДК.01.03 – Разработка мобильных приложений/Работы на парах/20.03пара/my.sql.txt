@@ -1,0 +1,16 @@
+CREATE DATABASE IF NOT EXISTS flutter_db;
+USE flutter_db;
+
+CREATE TABLE students (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    group_num VARCHAR(20) NOT NULL,
+    average_score DECIMAL(3,2) NOT NULL
+);
+
+-- Тестовые данные
+INSERT INTO students (name, group_num, average_score) VALUES
+('Иванов Иван', 'RPO-22', 4.5),
+('Петров Петр', 'RPO-22', 4.2),
+('Сидорова Анна', 'RPO-22', 4.9),
+('Смирнов Алексей', 'RPO-22', 4.7);
