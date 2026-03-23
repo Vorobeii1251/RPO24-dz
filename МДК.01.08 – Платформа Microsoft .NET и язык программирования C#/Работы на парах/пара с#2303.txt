@@ -2,47 +2,47 @@ using System;
 
 public static class CurrencyConverter
 {
-    private static double usdToRubRate = 75.5;
+    private static double kurs = 75.5;
 
-    public static void SetRate(double rate)
+    public static void SmenitKurs(double noviyKurs)
     {
-        usdToRubRate = rate;
-        Console.WriteLine($"Курс обновлен: 1 USD = {usdToRubRate:F2} RUB");
+        kurs = noviyKurs;
+        Console.WriteLine($"Новый курс: 1$ = {kurs} руб.");
     }
 
-    public static double ConvertUsdToRub(double usd)
+    public static double DollaryVRubli(double dollary)
     {
-        double result = usd * usdToRubRate;
-        Console.WriteLine($"{usd:F2} USD = {result:F2} RUB");
+        double result = dollary * kurs;
+        Console.WriteLine($"{dollary}$ = {result} руб.");
         return result;
     }
 
-    public static double ConvertRubToUsd(double rub)
+    public static double RubliVDollary(double rubli)
     {
-        double result = rub / usdToRubRate;
-        Console.WriteLine($"{rub:F2} RUB = {result:F2} USD");
+        double result = rubli / kurs;
+        Console.WriteLine($"{rubli} руб. = {result}$");
         return result;
     }
 }
 
-public class Circle
+public class Krug
 {
     public const double PI = 3.14159;
     public double Radius;
 
-    public Circle(double radius)
+    public Krug(double r)
     {
-        Radius = radius;
+        Radius = r;
     }
 
-    public double GetArea()
+    public double Ploshad()
     {
         return PI * Radius * Radius;
     }
 
-    public void PrintInfo()
+    public void Pokazat()
     {
-        Console.WriteLine($"Радиус: {Radius:F2}, Площадь: {GetArea():F2}");
+        Console.WriteLine($"Радиус: {Radius}, Площадь: {Ploshad():F2}");
     }
 }
 
@@ -52,41 +52,37 @@ class Program
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-        Console.WriteLine("задача 3:\n");
+        Console.WriteLine("ЗАДАЧА 3: Конвертер валют\n");
 
-        Console.Write("Введите сумму в USD для конвертации: ");
-        double usd = double.Parse(Console.ReadLine());
-        CurrencyConverter.ConvertUsdToRub(usd);
+        Console.Write("Долларов в рубли: ");
+        double d = double.Parse(Console.ReadLine());
+        CurrencyConverter.DollaryVRubli(d);
 
-        Console.Write("Введите сумму в RUB для конвертации: ");
-        double rub = double.Parse(Console.ReadLine());
-        CurrencyConverter.ConvertRubToUsd(rub);
+        Console.Write("Рублей в доллары: ");
+        double r = double.Parse(Console.ReadLine());
+        CurrencyConverter.RubliVDollary(r);
 
-        Console.Write("\nВведите новый курс USD к RUB: ");
-        double newRate = double.Parse(Console.ReadLine());
-        CurrencyConverter.SetRate(newRate);
+        Console.Write("Новый курс: ");
+        double k = double.Parse(Console.ReadLine());
+        CurrencyConverter.SmenitKurs(k);
 
-        Console.Write("Введите сумму в USD для конвертации по новому курсу: ");
-        usd = double.Parse(Console.ReadLine());
-        CurrencyConverter.ConvertUsdToRub(usd);
+        Console.Write("Еще долларов: ");
+        d = double.Parse(Console.ReadLine());
+        CurrencyConverter.DollaryVRubli(d);
 
-        Console.WriteLine("\nзадача 4:\n");
+        Console.WriteLine("\nЗАДАЧА 4: Круг\n");
 
-        Console.Write("Введите радиус первого круга: ");
-        double r1 = double.Parse(Console.ReadLine());
-        Circle c1 = new Circle(r1);
+        Console.Write("Радиус 1: ");
+        Krug k1 = new Krug(double.Parse(Console.ReadLine()));
 
-        Console.Write("Введите радиус второго круга: ");
-        double r2 = double.Parse(Console.ReadLine());
-        Circle c2 = new Circle(r2);
+        Console.Write("Радиус 2: ");
+        Krug k2 = new Krug(double.Parse(Console.ReadLine()));
 
         Console.WriteLine("\nКруг 1:");
-        c1.PrintInfo();
-        Console.WriteLine($"Площадь круга 1: {c1.GetArea():F2}");
+        k1.Pokazat();
 
         Console.WriteLine("\nКруг 2:");
-        c2.PrintInfo();
-        Console.WriteLine($"Площадь круга 2: {c2.GetArea():F2}");
+        k2.Pokazat();
 
         Console.ReadKey();
     }
