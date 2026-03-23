@@ -1,0 +1,93 @@
+using System;
+
+public static class CurrencyConverter
+{
+    private static double usdToRubRate = 75.5;
+
+    public static void SetRate(double rate)
+    {
+        usdToRubRate = rate;
+        Console.WriteLine($"Курс обновлен: 1 USD = {usdToRubRate:F2} RUB");
+    }
+
+    public static double ConvertUsdToRub(double usd)
+    {
+        double result = usd * usdToRubRate;
+        Console.WriteLine($"{usd:F2} USD = {result:F2} RUB");
+        return result;
+    }
+
+    public static double ConvertRubToUsd(double rub)
+    {
+        double result = rub / usdToRubRate;
+        Console.WriteLine($"{rub:F2} RUB = {result:F2} USD");
+        return result;
+    }
+}
+
+public class Circle
+{
+    public const double PI = 3.14159;
+    public double Radius;
+
+    public Circle(double radius)
+    {
+        Radius = radius;
+    }
+
+    public double GetArea()
+    {
+        return PI * Radius * Radius;
+    }
+
+    public void PrintInfo()
+    {
+        Console.WriteLine($"Радиус: {Radius:F2}, Площадь: {GetArea():F2}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+        Console.WriteLine("задача 3:\n");
+
+        Console.Write("Введите сумму в USD для конвертации: ");
+        double usd = double.Parse(Console.ReadLine());
+        CurrencyConverter.ConvertUsdToRub(usd);
+
+        Console.Write("Введите сумму в RUB для конвертации: ");
+        double rub = double.Parse(Console.ReadLine());
+        CurrencyConverter.ConvertRubToUsd(rub);
+
+        Console.Write("\nВведите новый курс USD к RUB: ");
+        double newRate = double.Parse(Console.ReadLine());
+        CurrencyConverter.SetRate(newRate);
+
+        Console.Write("Введите сумму в USD для конвертации по новому курсу: ");
+        usd = double.Parse(Console.ReadLine());
+        CurrencyConverter.ConvertUsdToRub(usd);
+
+        Console.WriteLine("\nзадача 4:\n");
+
+        Console.Write("Введите радиус первого круга: ");
+        double r1 = double.Parse(Console.ReadLine());
+        Circle c1 = new Circle(r1);
+
+        Console.Write("Введите радиус второго круга: ");
+        double r2 = double.Parse(Console.ReadLine());
+        Circle c2 = new Circle(r2);
+
+        Console.WriteLine("\nКруг 1:");
+        c1.PrintInfo();
+        Console.WriteLine($"Площадь круга 1: {c1.GetArea():F2}");
+
+        Console.WriteLine("\nКруг 2:");
+        c2.PrintInfo();
+        Console.WriteLine($"Площадь круга 2: {c2.GetArea():F2}");
+
+        Console.ReadKey();
+    }
+}
