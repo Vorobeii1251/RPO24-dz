@@ -31,8 +31,8 @@ class CounterScreen extends StatefulWidget {
 class _CounterScreenState extends State<CounterScreen> {
   int _counter = 0;
 
-  // Новый цвет фона - лавандовый
-  final Color _backgroundColor = const Color(0xFFE8DEF8); // 👈 лавандовый
+  //лавандовый
+  final Color _backgroundColor = const Color(0xFFE8DEF8);
 
   @override
   void initState() {
