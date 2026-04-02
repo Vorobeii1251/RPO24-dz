@@ -1,0 +1,107 @@
+// main.cpp с ошибкой линковки
+#include "calculator.h"
+#include <iostream>
+
+// Объявление функции, которая НЕ реализована
+void missingFunction();  // только объявление, нет реализации
+
+int main() {
+    missingFunction();  // ОШИБКА ЛИНКОВКИ!
+    return 0;
+}
+
+
+//g++ -c main.cpp -o main.o
+//# Успешно: main.o создан
+
+//Линковка (вызовет ошибку):
+//g++ main.o -o program
+
+// в calculator.cpp добавляем это чтобы вызвать функцию и все заработает
+//void missingFunction() {
+//   std::cout << "Missing function implemented!" << std::endl;
+//}
+
+
+#include "calculator.h"
+#include <iostream>
+#include <vector>
+
+int main() {
+    std::cout << "КАЛЬКУЛЯТОР" << std::endl;
+    
+    int x = 10;
+    int y = 3;
+    
+    printResult("10 + 3", add(x, y));
+    printResult("10 - 3", subtract(x, y));
+    printResult("10 * 3", multiply(x, y));
+    
+    try {
+        printResult("10 / 3", divide(x, y));
+        printResult("10 / 0", divide(x, 0));
+    } catch (const std::exception& e) {
+        std::cout << "Ошибка: " << e.what() << std::endl;
+    }
+    
+    int uninitializedVar;
+    std::cout << "Uninitialized: " << uninitializedVar << std::endl;
+    
+    printResult("5!", factorial(5));
+    
+    std::vector<int> numbers = {1, 2, 3, 4, 5};
+    double avg = calculateAverage(numbers);
+    printResult("Среднее [1,2,3,4,5]", avg);
+    
+    unsigned int u = 10;
+    int s = -5;
+    if (u > s) {
+        std::cout << "Сравнение unsigned > signed" << std::endl;
+    }
+    
+    return 0;
+}
+
+
+
+/*# 1. Создаём папку для сборки
+mkdir -p build
+
+# 2. Компилируем каждый .cpp в объектный файл (.o)
+g++ -c main.cpp -o build/main.o -I.
+g++ -c calculator.cpp -o build/calculator.o -I.
+
+# 3. Линкуем объектные файлы в исполняемый
+g++ build/main.o build/calculator.o -o build/program
+
+# 4. Запускаем
+./build/program*/
+
+
+
+
+/*Debug сборка (с отладочной информацией):
+bash
+g++ -g -O0 -DDEBUG main.cpp calculator.cpp -o build/program_debug
+Характеристики:
+
+Размер: большой (включает отладочные символы)
+
+Скорость: медленная (нет оптимизаций)
+
+Отладка: можно использовать GDB, есть символы
+
+Release сборка (с оптимизациями):
+bash
+g++ -O2 -DNDEBUG -s main.cpp calculator.cpp -o build/program_release
+Характеристики:
+
+Размер: маленький (удалены отладочные символы, -s)
+
+Скорость: быстрая (оптимизации -O2)
+
+Отладка: сложная (оптимизации могут "переставить" код)*/
+
+
+
+//g++ -Wall -Wextra -c calculator.cpp -o build/calculator.o -I.
