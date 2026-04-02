@@ -1,0 +1,31 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    int x;  // Предупреждение: неинициализированная переменная
+    cout << x << endl;
+    
+    int arr[5];
+    for (int i = 0; i <= 5; i++) {  // Предупреждение: выход за границы (i <= 5)
+        arr[i] = i * 10;
+    }
+    
+    unsigned int a = 5;
+    int b = -10;
+    if (a > b) {  // Предупреждение: сравнение signed/unsigned
+        cout << "Сравнение signed/unsigned" << endl;
+    }
+    
+    int* ptr = new int(10);
+    // Предупреждение: утечка памяти (нет delete)
+    
+    vector<int> vec;
+    for (int i = 0; i < vec.size(); i++) {  // Предупреждение: сравнение signed/unsigned
+        cout << vec[i] << endl;
+    }
+    
+    return 0;
+}
+
+//g++ -Wall -Wextra -o warning_example warning_example.cpp это надо в git bash

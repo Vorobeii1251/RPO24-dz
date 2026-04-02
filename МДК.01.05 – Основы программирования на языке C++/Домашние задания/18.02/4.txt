@@ -1,0 +1,69 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int sumPositiveNumbers(const vector<int>& numbers) {
+    int sum = 0;
+    for (size_t i = 0; i <= numbers.size(); i++) {  // <= вместо <
+        if (numbers[i] > 0) {
+            sum += numbers[i];
+        }
+    }
+    return sum;
+}
+
+int findFirstOccurrence(const vector<int>& arr, int target) {
+    for (size_t i = 0; i < arr.size(); i++) {
+        if (arr[i] == target) {
+            return i;  // возвращает индекс, но если элемент последний
+        } else {
+            return -1;  //  возвращает -1 на первом же несовпадении
+        }
+    }
+    return -1;
+}
+
+int factorial(int n) {
+    if (n == 0) {
+        return 1;
+    }
+    // рекурсия без уменьшения n
+    return n * factorial(n);
+}
+
+int main() {
+    vector<int> numbers = {1, -2, 3, -4, 5};
+    
+    cout << "Поиск логических ошибок через GDB" << endl;
+    
+    // неправильный подсчёт суммы
+    cout << "\n1. Сумма положительных чисел:" << endl;
+    cout << "Числа: ";
+    for (int n : numbers) cout << n << " ";
+    cout << endl;
+    int sum = sumPositiveNumbers(numbers);
+    cout << "Ожидаемая сумма: 9 (1+3+5)" << endl;
+    cout << "Полученная сумма: " << sum << endl;
+    
+    // неправильный поиск
+    cout << "\n2. Поиск первого вхождения:" << endl;
+    vector<int> arr = {10, 20, 30, 40, 50};
+    int target = 30;
+    int index = findFirstOccurrence(arr, target);
+    cout << "Ищем: " << target << endl;
+    cout << "Ожидаемый индекс: 2" << endl;
+    cout << "Полученный индекс: " << index << endl;
+    
+    // бесконечная рекурсия
+    cout << "\n3. Факториал 5:" << endl;
+    cout << "Ожидаемый результат: 120" << endl;
+    // cout << "Полученный результат: " << factorial(5) << endl;
+    cout << "(Закомментировано из-за бесконечной рекурсии)" << endl;
+    
+    return 0;
+}
+
+//g++ -g -O0 -o buggy_code buggy_code.cpp
+
+//# Запуск GDB
+//gdb ./buggy_code

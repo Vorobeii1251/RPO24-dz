@@ -1,0 +1,72 @@
+#include <iostream>
+using namespace std;
+
+void integerOverflow() {
+    int x = INT_MAX;
+    cout << "x = " << x << endl;
+    
+    // UB: переполнение знакового целого
+    x = x + 1;
+    cout << "x + 1 = " << x << endl;  // Результат неопределён!
+}
+
+void divisionByZero() {
+    int a = 10;
+    int b = 0;
+    
+    // UB: деление на ноль
+    int result = a / b;
+    cout << "10 / 0 = " << result << endl;
+}
+
+void shiftOverflow() {
+    int x = 1;
+    
+    // UB: сдвиг на количество бит >= sizeof(int)*8
+    x = x << 32;
+    cout << "1 << 32 = " << x << endl;
+}
+
+void nullPointerDereference() {
+    int* ptr = nullptr;
+    
+    // UB: разыменование нулевого указателя
+    *ptr = 42;
+    cout << "*ptr = " << *ptr << endl;
+}
+
+void invalidCast() {
+    double d = 3.14;
+    int* p = reinterpret_cast<int*>(&d);
+    
+    // UB: нарушение strict aliasing
+    *p = 100;
+    cout << "После каста: " << d << endl;
+}
+
+int main() {
+    cout << "=== Демонстрация Undefined Behavior ===" << endl;
+    
+    cout << "\n1. Переполнение знакового целого:" << endl;
+    integerOverflow();
+    
+    cout << "\n2. Деление на ноль:" << endl;
+    divisionByZero();
+    
+    cout << "\n3. Сдвиг за пределы:" << endl;
+    shiftOverflow();
+    
+    cout << "\n4. Null pointer dereference:" << endl;
+    nullPointerDereference();
+    
+    cout << "\n5. Invalid cast (strict aliasing):" << endl;
+    invalidCast();
+    
+    return 0;
+}
+
+//# Компиляция с UBSan
+//g++ -fsanitize=undefined -g -O0 -o ub_example ub_example.cpp
+
+//# Запуск
+//./ub_example

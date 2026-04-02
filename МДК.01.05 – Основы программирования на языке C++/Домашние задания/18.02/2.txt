@@ -1,0 +1,51 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+void dangerousFunction() {
+    int arr[5] = {1, 2, 3, 4, 5};
+    
+    // ОШИБКА: выход за границы массива
+    for (int i = 0; i <= 10; i++) {
+        arr[i] = i * 100;  // При i=5,6,7,8,9,10 - выход за границы!
+        cout << "arr[" << i << "] = " << arr[i] << endl;
+    }
+}
+
+void stackBufferOverflow() {
+    char buffer[10];
+    // ОШИБКА: копирование строки без проверки длины
+    strcpy(buffer, "This string is definitely longer than 10 characters!");
+    cout << "Buffer: " << buffer << endl;
+}
+
+void heapBufferOverflow() {
+    int* arr = new int[5];
+    
+    // ОШИБКА: запись за пределы выделенной памяти
+    for (int i = 0; i <= 10; i++) {
+        arr[i] = i * 50;
+    }
+    
+    delete[] arr;
+}
+
+int main() {
+    cout << "=== Демонстрация выхода за границы массива ===" << endl;
+    
+    cout << "\n1. Стек-массив:" << endl;
+    dangerousFunction();
+    
+    cout << "\n2. Стек-буфер (strcpy):" << endl;
+    stackBufferOverflow();
+    
+    cout << "\n3. Куча-массив:" << endl;
+    heapBufferOverflow();
+    
+    return 0;
+}
+
+//g++ -fsanitize=address -g -O0 -o out_of_bounds out_of_bounds.cpp
+
+//# Запуск
+//./out_of_bounds
