@@ -1,0 +1,605 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math';
+
+void main() {
+  runApp(const VictorinaApp());
+}
+
+//ТОЧКА ВХОДА
+
+class VictorinaApp extends StatelessWidget {
+  const VictorinaApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Викторина',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
+      home: const VictorinaHome(),
+    );
+  }
+}
+
+//ГЛАВНЫЙ ЭКРАН
+
+class VictorinaHome extends StatefulWidget {
+  const VictorinaHome({super.key});
+
+  @override
+  State<VictorinaHome> createState() => _VictorinaHomeState();
+}
+
+class _VictorinaHomeState extends State<VictorinaHome> {
+  int _bestScore = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBestScore();
+  }
+
+  // Загрузка рекорда из хранилища
+  Future<void> _loadBestScore() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _bestScore = prefs.getInt('best_score') ?? 0;
+    });
+  }
+
+  // Сохранение рекорда (только если новый счёт больше)
+  Future<void> _saveBestScore(int score) async {
+    final prefs = await SharedPreferences.getInstance();
+    final currentBest = prefs.getInt('best_score') ?? 0;
+    if (score > currentBest) {
+      await prefs.setInt('best_score', score);
+      setState(() => _bestScore = score);
+    }
+  }
+
+  //СБРОС РЕКОРДА
+  Future<void> _resetBestScore() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('best_score');  // Удаляем значение из хранилища
+    setState(() {
+      _bestScore = 0;  // Обнуляем на экране
+    });
+
+    // Показываем уведомление о сбросе
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Рекорд сброшен!'),
+        duration: Duration(seconds: 2),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('🎯 Викторина'),
+        centerTitle: true,
+        elevation: 2,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Иконка
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.quiz,
+                  size: 80,
+                  color: Colors.blue,
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // Заголовок
+              const Text(
+                'Викторина',
+                style: TextStyle(
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Рекорд
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade100,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.emoji_events, color: Colors.amber, size: 28),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Рекорд: $_bestScore',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 40),
+
+              // Кнопка "Начать"
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => QuizScreen(
+                        onFinish: _saveBestScore,
+                      ),
+                    ),
+                  ).then((_) => _loadBestScore()); // Обновляем рекорд при возврате
+                },
+                icon: const Icon(Icons.play_arrow, size: 28),
+                label: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  child: Text(
+                    'Начать',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 8),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // КНОПКА СБРОСА РЕКОРДА
+              TextButton.icon(
+                onPressed: _resetBestScore,
+                icon: const Icon(Icons.delete, size: 20, color: Colors.red),
+                label: const Text(
+                  'Сбросить рекорд',
+                  style: TextStyle(fontSize: 16, color: Colors.red),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+class QuizScreen extends StatefulWidget {
+  final Function(int) onFinish;
+
+  const QuizScreen({super.key, required this.onFinish});
+
+  @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  // Вопросы с вариантами ответов
+  final List<Map<String, dynamic>> _questions = [
+    {
+      'question': 'Какая столица Франции?',
+      'options': ['Лондон', 'Берлин', 'Париж', 'Мадрид'],
+      'correct': 2,  // Париж (индекс 2)
+    },
+    {
+      'question': 'Сколько планет в Солнечной системе?',
+      'options': ['7', '8', '9', '10'],
+      'correct': 1,  // 8 (индекс 1)
+    },
+    {
+      'question': 'Кто написал "Войну и мир"?',
+      'options': ['Достоевский', 'Толстой', 'Чехов', 'Пушкин'],
+      'correct': 1,  // Толстой (индекс 1)
+    },
+    {
+      'question': 'Какой язык программирования используется для Flutter?',
+      'options': ['Java', 'Kotlin', 'Dart', 'Swift'],
+      'correct': 2,  // Dart (индекс 2)
+    },
+    {
+      'question': 'Что такое HTTP?',
+      'options': [
+        'Язык программирования',
+        'Протокол передачи данных',
+        'База данных',
+        'Операционная система'
+      ],
+      'correct': 1,  // Протокол передачи данных (индекс 1)
+    },
+  ];
+
+  int _currentQuestion = 0;
+  int _score = 0;
+  bool _answered = false;
+  bool _showResult = false;
+
+  //ТАЙМЕР
+  int _timeLeft = 10;  // Оставшееся время (10 секунд)
+  bool _timerActive = true;  // Активен ли таймер
+  late final Timer _timer;  // Объект таймера
+
+  @override
+  void initState() {
+    super.initState();
+    // Перемешиваем вопросы при каждом запуске
+    _questions.shuffle(Random());
+    // Запускаем таймер для первого вопроса
+    _startTimer();
+  }
+
+  //ЗАПУСК ТАЙМЕРА
+  void _startTimer() {
+    _timeLeft = 10;
+    _timerActive = true;
+
+    // Создаём периодический таймер (каждую секунду)
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;  // Если виджет уничтожен — выходим
+
+      setState(() {
+        if (_timeLeft > 1 && _timerActive && !_answered && !_showResult) {
+          _timeLeft--;  // Уменьшаем время
+        } else if (_timeLeft == 1 && !_answered && !_showResult) {
+          // Время вышло!
+          _timeLeft = 0;
+          _timer.cancel();  // Останавливаем таймер
+
+          // Автоматически засчитываем неправильный ответ
+          _handleTimeout();
+        }
+      });
+    });
+  }
+
+//ОБРАБОТКА ТАЙМАУТА
+  void _handleTimeout() {
+    if (_answered || _showResult) return;  // Если уже ответили или игра окончена
+
+    setState(() {
+      _answered = true;  // Блокируем кнопки
+      _timerActive = false;  // Останавливаем таймер
+    });
+
+    // Показываем уведомление о таймауте
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(' Время вышло! Правильный ответ: ${_getCurrentQuestion()['options'][_getCurrentQuestion()['correct']]}'),
+        duration: const Duration(milliseconds: 800),
+        backgroundColor: Colors.red,
+      ),
+    );
+
+    // Переход к следующему вопросу через 1 секунду
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+
+      setState(() {
+        if (_currentQuestion < _questions.length - 1) {
+          _currentQuestion++;
+          _answered = false;
+          _timerActive = true;
+          _startTimer();  // Запускаем новый таймер для следующего вопроса
+        } else {
+          _showResult = true;
+          _timer.cancel();  // Останавливаем таймер
+          widget.onFinish(_score);  // Сохраняем результат
+        }
+      });
+    });
+  }
+
+  // Получить текущий вопрос
+  Map<String, dynamic> _getCurrentQuestion() {
+    return _questions[_currentQuestion];
+  }
+
+  // Обработка выбора ответа
+  void _selectAnswer(int selectedIndex) {
+    if (_answered || _showResult) return;  // Нельзя ответить дважды
+
+    // Останавливаем таймер
+    _timer.cancel();
+    setState(() {
+      _timerActive = false;
+      _answered = true;
+    });
+
+    // Проверяем правильность ответа
+    final currentQuestion = _getCurrentQuestion();
+    final isCorrect = (selectedIndex == currentQuestion['correct']);
+
+    if (isCorrect) {
+      setState(() {
+        _score++;
+      });
+      // Показываем уведомление о правильном ответе
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(' Правильно!'),
+          duration: Duration(milliseconds: 500),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      // Показываем уведомление о неправильном ответе
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(' Неправильно! Правильный ответ: ${currentQuestion['options'][currentQuestion['correct']]}'),
+          duration: Duration(milliseconds: 800),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+
+    // Переход к следующему вопросу или завершение
+    Future.delayed(const Duration(seconds: 1), () {
+      if (!mounted) return;
+
+      setState(() {
+        if (_currentQuestion < _questions.length - 1) {
+          _currentQuestion++;
+          _answered = false;
+          _startTimer();  // Запускаем таймер для нового вопроса
+        } else {
+          _showResult = true;
+          widget.onFinish(_score);  // Сохраняем результат
+        }
+      });
+    });
+  }
+
+  // Перезапуск викторины
+  void _restart() {
+    setState(() {
+      _currentQuestion = 0;
+      _score = 0;
+      _answered = false;
+      _showResult = false;
+      _timeLeft = 10;
+      _timerActive = true;
+    });
+    // Перемешиваем вопросы заново
+    _questions.shuffle(Random());
+    _startTimer();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();  // Обязательно останавливаем таймер при выходе
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ЭКРАН РЕЗУЛЬТАТА
+    if (_showResult) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text(' Результат'),
+          centerTitle: true,
+          automaticallyImplyLeading: false,  // Убираем кнопку назад
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Иконка в зависимости от результата
+                Icon(
+                  _score == _questions.length
+                      ? Icons.emoji_events
+                      : _score > _questions.length / 2
+                          ? Icons.sentiment_satisfied
+                          : Icons.sentiment_dissatisfied,
+                  size: 100,
+                  color: _score == _questions.length
+                      ? Colors.amber
+                      : _score > _questions.length / 2
+                          ? Colors.green
+                          : Colors.grey,
+                ),
+                const SizedBox(height: 32),
+
+                // Результат (количество баллов)
+                Text(
+                  '$_score из ${_questions.length}',
+                  style: const TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Комментарий
+                Text(
+                  _score == _questions.length
+                      ? ' Абсолютный чемпион! '
+                      : _score > _questions.length / 2
+                          ? ' Хороший результат!'
+                          : ' Попробуй ещё раз!',
+                  style: const TextStyle(fontSize: 20),
+                ),
+                const SizedBox(height: 40),
+
+                // Кнопка "Играть снова"
+                ElevatedButton.icon(
+                  onPressed: _restart,
+                  icon: const Icon(Icons.refresh),
+                  label: const Text(
+                    'Играть снова',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                // Кнопка "На главную"
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);  // Возврат на главный экран
+                  },
+                  icon: const Icon(Icons.home),
+                  label: const Text('На главную'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    // ЭКРАН ВОПРОСА
+    final currentQuestion = _getCurrentQuestion();
+    final options = currentQuestion['options'] as List<String>;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Вопрос ${_currentQuestion + 1}/${_questions.length}'),
+        centerTitle: true,
+        // ========== ЗАДАНИЕ 2: ОТОБРАЖЕНИЕ ТАЙМЕРА В APP BAR ==========
+        actions: [
+          Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: _timeLeft <= 3 ? Colors.red.shade100 : Colors.blue.shade100,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.timer,
+                  color: _timeLeft <= 3 ? Colors.red : Colors.blue,
+                  size: 20,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  '$_timeLeft',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: _timeLeft <= 3 ? Colors.red : Colors.blue,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      body: IgnorePointer(
+        ignoring: _answered,  // Блокируем кнопки после ответа
+        child: AnimatedOpacity(
+          opacity: _answered ? 0.5 : 1.0,
+          duration: const Duration(milliseconds: 200),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Прогресс-бар (визуальный таймер)
+                LinearProgressIndicator(
+                  value: _timeLeft / 10,  // 10 секунд = 100%
+                  backgroundColor: Colors.grey.shade200,
+                  color: _timeLeft <= 3 ? Colors.red : Colors.blue,
+                  minHeight: 8,
+                ),
+                const SizedBox(height: 24),
+
+                // Счётчик очков
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    const Icon(Icons.star, color: Colors.amber, size: 20),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$_score/${_questions.length}',
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                // Текст вопроса
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Text(
+                      currentQuestion['question'],
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        height: 1.3,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Варианты ответов
+                ...options.map((option) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: ElevatedButton(
+                    onPressed: () => _selectAnswer(options.indexOf(option)),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      option,
+                      style: const TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                )).toList(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
