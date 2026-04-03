@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+
+class StudentList extends StatelessWidget {
+  final List<Map<String, dynamic>> students = [
+    {'group_num': 'А-101', 'average_score': '4.8'},
+    {'group_num': 'А-102', 'average_score': '3.5'},
+    {'group_num': 'А-103', 'average_score': '2.2'},
+    {'group_num': 'Б-201', 'average_score': '5.0'},
+    {'group_num': 'Б-202', 'average_score': '3.0'},
+  ];
+
+  Color _getScoreColor(String score) {
+    final value = double.parse(score);
+    if (value >= 4.5) {
+      return Colors.green; // Отличник
+    } else if (value >= 3.0) {
+      return Colors.orange; // Хорошист
+    } else {
+      return Colors.red; // Двоечник
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Список студентов'),
+      ),
+      body: ListView.builder(
+        itemCount: students.length,
+        itemBuilder: (context, index) {
+          final student = students[index];
+          return Card(
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: ListTile(
+              title: Text('Студент ${index + 1}'),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Группа: ${student['group_num']}'),
+                  Text(
+                    'Балл: ${student['average_score']}',
+                    style: TextStyle(
+                      color: _getScoreColor(student['average_score']),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
