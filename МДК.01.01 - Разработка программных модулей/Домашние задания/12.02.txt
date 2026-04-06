@@ -1,0 +1,80 @@
+1. Архитектура взаимодействия
+Python не общается с базой данных напрямую. Для связи используется драйвер.
+
+Драйвер для PostgreSQL:
+
+psycopg2 (классика, стабильность).
+
+psycopg (современный подход).
+
+Выбор: psycopg2 (идеально для обучения).
+
+2. Установка
+bash
+pip install psycopg2
+3. Подключение и Cursor
+Connection (conn) — устанавливает сессию с БД (хост, порт, пользователь, пароль).
+
+Cursor (cur) — объект для выполнения SQL-запросов и получения результатов.
+
+4. CRUD операции
+SELECT (Чтение)
+execute(sql) — отправить запрос.
+
+fetchall() / fetchone() — получить результат.
+Результат: список кортежей Python.
+
+INSERT / UPDATE / DELETE (Запись)
+Важно: использовать параметризованные запросы (%s).
+
+Зачем: защита от SQL-инъекций и автоматическая обработка типов.
+
+Плохо: подстановка через f-строки (риск взлома).
+
+Пример синтаксиса
+python
+# Правильно (параметры передаются вторым аргументом)
+cur.execute("INSERT INTO users (name) VALUES (%s);", (username,))
+
+# Для UPDATE
+cur.execute("UPDATE users SET age = %s WHERE id = %s;", (new_age, user_id))
+
+# Для DELETE (кортеж с одним элементом пишется с запятой)
+cur.execute("DELETE FROM users WHERE id = %s;", (user_id,))
+5. Транзакции (Важно!)
+PostgreSQL работает в транзакциях. Изменения не сохраняются автоматически.
+
+conn.commit() — фиксирует изменения (сохраняет в БД).
+
+conn.rollback() — откатывает изменения, если произошла ошибка.
+
+6. Закрытие соединения
+Всегда закрывайте ресурсы, чтобы избежать утечек (особенно критично в GUI и веб-приложениях).
+
+python
+cur.close()
+conn.close()
+Типичная структура кода:
+python
+import psycopg2
+
+try:
+    # 1. Установить соединение
+    conn = psycopg2.connect(dbname="test", user="postgres", password="pass", host="localhost")
+    cur = conn.cursor()
+
+    # 2. Выполнить запрос
+    cur.execute("SELECT * FROM users;")
+    data = cur.fetchall()
+
+    # 3. Если были изменения (INSERT/UPDATE/DELETE) - подтвердить
+    conn.commit()
+
+except Exception as e:
+    # 4. В случае ошибки - откатить
+    conn.rollback()
+    print(f"Error: {e}")
+finally:
+    # 5. Закрыть курсор и соединение
+    cur.close()
+    conn.close()
