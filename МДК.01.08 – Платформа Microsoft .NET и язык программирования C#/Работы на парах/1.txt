@@ -1,0 +1,85 @@
+using System;
+
+namespace GeometryFigures
+{
+    public abstract class Figure
+    {
+        public abstract double GetArea();
+        public abstract double GetPerimeter();
+
+        public void PrintInfo()
+        {
+            Console.WriteLine($"Тип фигуры: {this.GetType().Name}");
+            Console.WriteLine($"Площадь: {GetArea():F2}");
+            Console.WriteLine($"Периметр: {GetPerimeter():F2}");
+            Console.WriteLine(new string('─', 30));
+        }
+    }
+
+    public class Circle : Figure
+    {
+        public double Radius { get; set; }
+
+        public Circle(double radius)
+        {
+            Radius = radius;
+        }
+
+        public override double GetArea()
+        {
+            return Math.PI * Radius * Radius;
+        }
+
+        public override double GetPerimeter()
+        {
+            return 2 * Math.PI * Radius;
+        }
+    }
+
+    public class Rectangle : Figure
+    {
+        public double Width { get; set; }
+        public double Height { get; set; }
+
+        public Rectangle(double width, double height)
+        {
+            Width = width;
+            Height = height;
+        }
+
+        public override double GetArea()
+        {
+            return Width * Height;
+        }
+
+        public override double GetPerimeter()
+        {
+            return 2 * (Width + Height);
+        }
+    }
+
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("все фигуры: ");
+
+            Figure[] figures = new Figure[]
+            {
+                new Circle(11.0),
+                new Rectangle(23.0, 14.0),
+                new Circle(17.5),
+                new Rectangle(17.0, 13.0),
+            };
+
+            Console.WriteLine("\nИнформация о фигурах:\n");
+            foreach (var figure in figures)
+            {
+                figure.PrintInfo();
+            }
+
+            Console.ReadKey();
+        }
+    }
+}

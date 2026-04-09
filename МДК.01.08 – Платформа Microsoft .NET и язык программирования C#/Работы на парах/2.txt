@@ -1,0 +1,226 @@
+using System;
+using System.Collections.Generic;
+
+namespace PaymentSystem
+{
+    public abstract class Payment
+    {
+        public double Amount { get; set; }
+        public string TransactionId { get; set; }
+
+        protected Payment(double amount, string transactionId)
+        {
+            Amount = amount;
+            TransactionId = transactionId;
+        }
+
+        public abstract void ProcessPayment();
+
+        public static string GenerateTransactionId()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            Random rnd = new Random();
+            char[] result = new char[8];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = chars[rnd.Next(chars.Length)];
+            }
+            return new string(result);
+        }
+
+        public void PrintPaymentInfo()
+        {
+            Console.WriteLine($"ID транзакции: {TransactionId}");
+            Console.WriteLine($"Сумма: {Amount:F2} руб.");
+        }
+    }
+
+    public class CreditCardPayment : Payment
+    {
+        private const double Limit = 100000.0;
+
+        public CreditCardPayment(double amount, string transactionId)
+            : base(amount, transactionId)
+        {
+        }
+
+        public override void ProcessPayment()
+        {
+            Console.WriteLine("\n оплат по карте");
+            PrintPaymentInfo();
+
+            if (Amount > Limit)
+            {
+                Console.WriteLine($"деньга нету: Сумма {Amount:F2} руб. превышает лимит {Limit:F2} руб.");
+            }
+            else
+            {
+                Console.WriteLine($"все с кайфом, свободен: Оплата картой на сумму {Amount:F2} руб. одобрена.");
+            }
+        }
+    }
+
+    public class PayPalPayment : Payment
+    {
+        public PayPalPayment(double amount, string transactionId)
+            : base(amount, transactionId)
+        {
+        }
+
+        public override void ProcessPayment()
+        {
+            Console.WriteLine("\nплати налоги через PAYPAL");
+            PrintPaymentInfo();
+            Console.WriteLine("Перенаправление на PayPal...");
+            Console.WriteLine($"Оплата {Amount:F2} руб. успешна!");
+        }
+    }
+
+    public class CashPayment : Payment
+    {
+        public CashPayment(double amount, string transactionId)
+            : base(amount, transactionId)
+        {
+        }
+
+        public override void ProcessPayment()
+        {
+            Console.WriteLine("\n тока налик брат");
+            PrintPaymentInfo();
+            Console.WriteLine($"Оплата {Amount:F2} руб. принята.");
+            Console.WriteLine(new string('─', 40));
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("СИСТЕМА ПЛАТЕЖЕЙ");
+
+            List<Payment> payments = new List<Payment>();
+            bool continueAdding = true;
+
+            while (continueAdding)
+            {
+                Console.WriteLine("\n выбери уже да:");
+                Console.WriteLine("   1. оплат по карте");
+                Console.WriteLine("   2. плати налоги через PayPal");
+                Console.WriteLine("   3. тока налик брат");
+                Console.WriteLine("   0. Завершить ввод и обработать платежи");
+
+                string choice = Console.ReadLine();
+
+                if (choice == "0")
+                {
+                    continueAdding = false;
+                    break;
+                }
+
+                if (choice != "1" && choice != "2" && choice != "3")
+                {
+                    Console.WriteLine("Миша все фигня давай по новой");
+                    continue;
+                }
+
+                double amount = 0;
+                bool validAmount = false;
+                while (!validAmount)
+                {
+                    Console.Write("Введите сумму платежа: ");
+                    string amountInput = Console.ReadLine();
+                    if (double.TryParse(amountInput, out amount) && amount > 0)
+                    {
+                        validAmount = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("ну нормально введи уже емае.");
+                    }
+                }
+
+                string transactionId = Payment.GenerateTransactionId();
+
+                Payment newPayment = null;
+                switch (choice)
+                {
+                    case "1":
+                        newPayment = new CreditCardPayment(amount, transactionId);
+                        Console.WriteLine($"\nСоздан платеж по кредитной карте на сумму {amount:F2} руб.");
+                        break;
+                    case "2":
+                        newPayment = new PayPalPayment(amount, transactionId);
+                        Console.WriteLine($"\nСоздан PayPal платеж на сумму {amount:F2} руб.");
+                        break;
+                    case "3":
+                        newPayment = new CashPayment(amount, transactionId);
+                        Console.WriteLine($"\nСоздан платеж наличными на сумму {amount:F2} руб.");
+                        break;
+                }
+
+                payments.Add(newPayment);
+            }
+
+            if (payments.Count == 0)
+            {
+                Console.WriteLine("\nНет платежей для обработки. Программа завершена.");
+                Console.WriteLine("\nНажмите любую клавишу для выхода...");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine($"список платежей ({payments.Count} шт.):");
+
+            for (int i = 0; i < payments.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {payments[i].GetType().Name} - {payments[i].Amount:F2} руб. (ID: {payments[i].TransactionId})");
+            }
+
+            Console.Write("Обработать все платежи? (yes/no): ");
+            string confirm = Console.ReadLine()?.ToLower();
+
+            if (confirm != "да" && confirm != "yes" && confirm != "д")
+            {
+                Console.WriteLine("\nОбработка отменена. Программа завершена.");
+                Console.WriteLine("\nНажмите любую клавишу для выхода");
+                Console.ReadKey();
+                return;
+            }
+
+            Console.WriteLine("щас подожди обрабатываем");
+
+            foreach (var payment in payments)
+            {
+                payment.ProcessPayment();
+            }
+
+            double totalAmount = 0;
+            int successCount = 0;
+            int failedCount = 0;
+
+            foreach (var payment in payments)
+            {
+                totalAmount += payment.Amount;
+                successCount++;
+            }
+
+            Console.WriteLine(" ИТОГОВАЯ СТАТИСТИКА:");
+            Console.WriteLine($"   Всего платежей: {successCount}");
+            Console.WriteLine($"   Общая сумма: {totalAmount:F2} руб.");
+
+            Console.WriteLine("\nХотите добавить ещё один платёж? (yes/no): ");
+            string addMore = Console.ReadLine()?.ToLower();
+            if (addMore == "да" || addMore == "yes" || addMore == "д")
+            {
+                Console.Clear();
+                Main(args);
+            }
+            else
+            {
+                Console.WriteLine("\nСпасибо за использование системы платежей!");
+                Console.WriteLine("\nНажмите любую клавишу для выхода");
+                Console.ReadKey();
+            }
+        }
+    }
+}
