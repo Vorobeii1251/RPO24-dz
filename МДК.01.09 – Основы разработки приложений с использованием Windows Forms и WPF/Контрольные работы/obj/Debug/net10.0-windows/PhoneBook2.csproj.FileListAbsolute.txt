@@ -1,0 +1,16 @@
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook.MainForm.resources
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.csproj.GenerateResource.cache
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.AssemblyInfoInputs.cache
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.AssemblyInfo.cs
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.csproj.CoreCompileInputs.cache
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\bin\Debug\net10.0-windows\PhoneBook2.exe
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\bin\Debug\net10.0-windows\PhoneBook2.deps.json
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\bin\Debug\net10.0-windows\PhoneBook2.runtimeconfig.json
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\bin\Debug\net10.0-windows\PhoneBook2.dll
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\bin\Debug\net10.0-windows\PhoneBook2.pdb
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.dll
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\refint\PhoneBook2.dll
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.pdb
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\PhoneBook2.genruntimeconfig.cache
+C:\Users\Алена\рабочий стол\visual studio\PhoneBook2\PhoneBook2\obj\Debug\net10.0-windows\ref\PhoneBook2.dll
