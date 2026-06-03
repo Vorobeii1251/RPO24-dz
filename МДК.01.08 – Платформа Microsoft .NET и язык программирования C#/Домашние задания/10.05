@@ -1,0 +1,212 @@
+using System;
+using System.Threading;
+
+public interface Attackable
+{
+    void TakeDamage(int damage);
+    bool IsAlive();
+}
+
+public interface Attacker
+{
+    void Attack(Attackable target);
+}
+
+public class Warrior : Attackable, Attacker
+{
+    private int health;
+    private int strength;
+
+    public Warrior(int health, int strength)
+    {
+        this.health = health;
+        this.strength = strength;
+    }
+
+    public int Health
+    {
+        get { return health; }
+        set { health = value; }
+    }
+
+    public int Strength
+    {
+        get { return strength; }
+        set { strength = value; }
+    }
+
+    public void Attack(Attackable target)
+    {
+        if (!IsAlive())
+        {
+            Console.WriteLine("[Воин] не может атаковать — он мёртв!");
+            return;
+        }
+
+        Console.WriteLine($"[Воин] атакует с силой {strength}!");
+        target.TakeDamage(strength);
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (damage <= 0) return;
+
+        health -= damage;
+        if (health <= 0)
+        {
+            health = 0;
+            Console.WriteLine($"[Воин] получил {damage} урона и погиб!");
+        }
+        else
+        {
+            Console.WriteLine($"[Воин] получил {damage} урона. Осталось здоровья: {health}");
+        }
+    }
+
+    public bool IsAlive()
+    {
+        return health > 0;
+    }
+}
+
+public class Mage : Attackable, Attacker
+{
+    private int health;
+    private int mana;
+    private int spellPower;
+
+    public Mage(int health, int mana, int spellPower)
+    {
+        this.health = health;
+        this.mana = mana;
+        this.spellPower = spellPower;
+    }
+
+    public int Health
+    {
+        get { return health; }
+        set { health = value; }
+    }
+
+    public int Mana
+    {
+        get { return mana; }
+        set { mana = value; }
+    }
+
+    public int SpellPower
+    {
+        get { return spellPower; }
+        set { spellPower = value; }
+    }
+
+    public void Attack(Attackable target)
+    {
+        if (!IsAlive())
+        {
+            Console.WriteLine("[Маг] не может атаковать — он мёртв!");
+            return;
+        }
+
+        if (mana >= 10)
+        {
+            mana -= 10;
+            Console.WriteLine($"[Маг] колдует заклинание! Урон {spellPower}. Осталось маны: {mana}");
+            target.TakeDamage(spellPower);
+        }
+        else
+        {
+            Console.WriteLine($"[Маг] маны недостаточно! Атакует слабой магией на 1 урона.");
+            target.TakeDamage(1);
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        if (damage <= 0) return;
+
+        health -= damage;
+        if (health <= 0)
+        {
+            health = 0;
+            Console.WriteLine($"[Маг] получил {damage} урона и погиб!");
+        }
+        else
+        {
+            Console.WriteLine($"[Маг] получил {damage} урона. Осталось здоровья: {health}");
+        }
+    }
+
+    public bool IsAlive()
+    {
+        return health > 0;
+    }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        Console.WriteLine("БОЙ: ВОИН vs МАГ");
+        Console.WriteLine();
+
+        Warrior warrior = new Warrior(health: 100, strength: 20);
+        Mage mage = new Mage(health: 80, mana: 30, spellPower: 25);
+
+        Console.WriteLine("НАЧАЛЬНЫЕ ХАРАКТЕРИСТИКИ");
+        Console.WriteLine($"Воин: Здоровье = {warrior.Health}, Сила = {warrior.Strength}");
+        Console.WriteLine($"Маг: Здоровье = {mage.Health}, Мана = {mage.Mana}, Сила заклинания = {mage.SpellPower}");
+        Console.WriteLine();
+        Console.WriteLine("НАЧИНАЕМ БОЙ!");
+        Console.WriteLine();
+
+        int round = 1;
+        Random random = new Random();
+
+        while (warrior.IsAlive() && mage.IsAlive())
+        {
+            Console.WriteLine($"РАУНД {round}");
+
+            bool warriorFirst = random.Next(2) == 0;
+
+            if (warriorFirst)
+            {
+                warrior.Attack(mage);
+                if (!mage.IsAlive()) break;
+
+                mage.Attack(warrior);
+            }
+            else
+            {
+                mage.Attack(warrior);
+                if (!warrior.IsAlive()) break;
+
+                warrior.Attack(mage);
+            }
+
+            Console.WriteLine($"После раунда: Воин {warrior.Health} | Маг {mage.Health} (мана: {mage.Mana})");
+            Console.WriteLine();
+
+            round++;
+
+            Thread.Sleep(500);
+        }
+
+        Console.WriteLine("ИТОГ БИТВЫ");
+        if (warrior.IsAlive() && !mage.IsAlive())
+        {
+            Console.WriteLine("ПОБЕДИТЕЛЬ: ВОИН!");
+            Console.WriteLine($"Осталось здоровья у воина: {warrior.Health}");
+        }
+        else if (mage.IsAlive() && !warrior.IsAlive())
+        {
+            Console.WriteLine("ПОБЕДИТЕЛЬ: МАГ!");
+            Console.WriteLine($"Осталось здоровья у мага: {mage.Health}");
+        }
+        else
+        {
+            Console.WriteLine("ОБА ПЕРСОНАЖА ПОГИБЛИ!");
+        }
+    }
+}
