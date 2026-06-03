@@ -1,0 +1,144 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace LinqTasks
+{
+    class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string City { get; set; }
+    }
+
+    class Product
+    {
+        public string Name { get; set; }
+        public decimal Price { get; set; }
+        public int Rating { get; set; }
+        public string Category { get; set; }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            Console.WriteLine("№1\n");
+
+            List<Person> people = new List<Person>
+            {
+                new Person { Name = "Иван Петров", Age = 30, City = "Москва" },
+                new Person { Name = "Анна Сидорова", Age = 22, City = "Санкт-Петербург" },
+                new Person { Name = "Олег Кузнецов", Age = 19, City = "Москва" },
+                new Person { Name = "Мария Васильева", Age = 28, City = "Москва" },
+                new Person { Name = "Алексей Смирнов", Age = 24, City = "Казань" },
+                new Person { Name = "Екатерина Иванова", Age = 26, City = "Москва" },
+                new Person { Name = "Дмитрий Михайлов", Age = 21, City = "Новосибирск" },
+                new Person { Name = "Ольга Соколова", Age = 35, City = "Москва" },
+                new Person { Name = "Сергей Фёдоров", Age = 18, City = "Екатеринбург" },
+                new Person { Name = "Татьяна Морозова", Age = 23, City = "Москва" },
+            };
+
+            Console.WriteLine("Все имена");
+            var names = people.Select(p => p.Name);
+            foreach (var name in names)
+            {
+                Console.WriteLine(name);
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Жители Москвы");
+            var moscowResidents = people.Where(p => p.City == "Москва");
+            foreach (var person in moscowResidents)
+            {
+                Console.WriteLine($"{person.Name}, {person.Age} лет, {person.City}");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Старше 25 лет");
+            var olderThan25 = people.Where(p => p.Age > 25);
+            foreach (var person in olderThan25)
+            {
+                Console.WriteLine($"{person.Name}, {person.Age} лет, {person.City}");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Младше 25 лет (по возрастанию возраста)");
+            var youngerThan25Sorted = people
+                .Where(p => p.Age < 25)
+                .OrderBy(p => p.Age);
+            foreach (var person in youngerThan25Sorted)
+            {
+                Console.WriteLine($"{person.Name}, {person.Age} лет, {person.City}");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("№2\n");
+
+            List<Product> products = new List<Product>
+            {
+                new Product { Name = "Ноутбук", Price = 45000, Rating = 5, Category = "Электроника" },
+                new Product { Name = "Мышь", Price = 800, Rating = 4, Category = "Электроника" },
+                new Product { Name = "Клавиатура", Price = 1200, Rating = 5, Category = "Электроника" },
+                new Product { Name = "Книга 'C# для начинающих'", Price = 500, Rating = 5, Category = "Книги" },
+                new Product { Name = "Книга 'Алгоритмы'", Price = 750, Rating = 4, Category = "Книги" },
+                new Product { Name = "Наушники", Price = 1500, Rating = 5, Category = "Электроника" },
+                new Product { Name = "Блокнот", Price = 150, Rating = 3, Category = "Канцелярия" },
+                new Product { Name = "Ручка", Price = 50, Rating = 4, Category = "Канцелярия" },
+                new Product { Name = "Флешка 32GB", Price = 900, Rating = 5, Category = "Электроника" },
+                new Product { Name = "Чехол для телефона", Price = 400, Rating = 4, Category = "Аксессуары" },
+            };
+
+            Console.WriteLine("Товары дешевле 1000 руб.");
+            var cheapProducts = products.Where(p => p.Price < 1000);
+            foreach (var product in cheapProducts)
+            {
+                Console.WriteLine($"{product.Name} - {product.Price} руб. (Категория: {product.Category})");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Товары с оценкой 5");
+            var topRatedProducts = products.Where(p => p.Rating == 5);
+            foreach (var product in topRatedProducts)
+            {
+                Console.WriteLine($"{product.Name} - {product.Price} руб. (Категория: {product.Category})");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Группировка товаров по категориям");
+            var groupedByCategory = products.GroupBy(p => p.Category);
+            foreach (var group in groupedByCategory)
+            {
+                Console.WriteLine($"\nКатегория: {group.Key}");
+                foreach (var product in group)
+                {
+                    Console.WriteLine($"{product.Name} - {product.Price} руб. (Оценка: {product.Rating})");
+                }
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Доп стата\n");
+
+            Console.WriteLine("Количество товаров по категориям");
+            var categoryCounts = products.GroupBy(p => p.Category)
+                .Select(g => new { Category = g.Key, Count = g.Count() });
+            foreach (var item in categoryCounts)
+            {
+                Console.WriteLine($"{item.Category}: {item.Count} товаров");
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Средняя цена по категориям");
+            var averagePrices = products.GroupBy(p => p.Category)
+                .Select(g => new { Category = g.Key, AveragePrice = g.Average(p => p.Price) });
+            foreach (var item in averagePrices)
+            {
+                Console.WriteLine($"{item.Category}: {item.AveragePrice:F2} руб.");
+            }
+
+            Console.ReadKey();
+        }
+    }
+}
