@@ -1,0 +1,115 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace StudentAnalysis
+{
+    public class Student
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime BirthDate { get; set; }
+        public double AverageScore { get; set; }
+
+        public string FullName => $"{LastName} {FirstName}";
+
+        public int Age
+        {
+            get
+            {
+                var today = DateTime.Today;
+                var age = today.Year - BirthDate.Year;
+                if (BirthDate.Date > today.AddYears(-age)) age--;
+                return age;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"{FullName} - {AverageScore:F1}";
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+
+            List<Student> students = new List<Student>
+            {
+                new Student { FirstName = "Иван", LastName = "Петров", BirthDate = new DateTime(2004, 5, 15), AverageScore = 85.5 },
+                new Student { FirstName = "Анна", LastName = "Сидорова", BirthDate = new DateTime(2001, 8, 20), AverageScore = 78.1 },
+                new Student { FirstName = "Олег", LastName = "Кузнецов", BirthDate = new DateTime(2005, 3, 10), AverageScore = 74.9 },
+                new Student { FirstName = "Мария", LastName = "Васильева", BirthDate = new DateTime(1998, 11, 2), AverageScore = 68.3 },
+                new Student { FirstName = "Алексей", LastName = "Смирнов", BirthDate = new DateTime(2002, 7, 25), AverageScore = 95.2 },
+                new Student { FirstName = "Екатерина", LastName = "Иванова", BirthDate = new DateTime(2003, 1, 18), AverageScore = 88.4 },
+                new Student { FirstName = "Дмитрий", LastName = "Михайлов", BirthDate = new DateTime(2000, 9, 30), AverageScore = 72.0 },
+                new Student { FirstName = "Ольга", LastName = "Соколова", BirthDate = new DateTime(2004, 6, 12), AverageScore = 91.3 },
+            };
+
+            Console.WriteLine("Список студентов-хорошистов (балл от 75 до 90)");
+
+            var goodStudents = students
+                .Where(s => s.AverageScore >= 75 && s.AverageScore <= 90)
+                .Select(s => $"{s.FullName} - {s.AverageScore:F1}");
+
+            foreach (var student in goodStudents)
+            {
+                Console.WriteLine(student);
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Все студенты");
+
+            var namesOnly = students
+                .Select(s => s.FullName);
+
+            foreach (var name in namesOnly)
+            {
+                Console.WriteLine(name);
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Сортировка по возрасту");
+
+            var sortedByAge = students
+                .OrderBy(s => s.Age)
+                .Select(s => $"{s.FullName} - {s.Age} {GetAgeWord(s.Age)}");
+
+            foreach (var student in sortedByAge)
+            {
+                Console.WriteLine(student);
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Рейтинг студентов младше 25 лет (по убыванию балла)");
+
+            var rating = students
+                .Where(s => s.Age < 25)
+                .OrderByDescending(s => s.AverageScore) 
+                .Select(s => $"{s.FullName} - {s.AverageScore:F1}");
+
+            foreach (var student in rating)
+            {
+                Console.WriteLine(student);
+            }
+            Console.WriteLine();
+
+            Console.WriteLine("Дополнительная статистика");
+            Console.WriteLine($"Всего студентов: {students.Count}");
+            Console.WriteLine($"Средний балл по группе: {students.Average(s => s.AverageScore):F2}");
+            Console.WriteLine($"Самый старший студент: {students.OrderByDescending(s => s.Age).First().FullName}");
+            Console.WriteLine($"Самый младший студент: {students.OrderBy(s => s.Age).First().FullName}");
+            Console.WriteLine($"Лучший студент: {students.OrderByDescending(s => s.AverageScore).First().FullName} - {students.Max(s => s.AverageScore):F1}");
+
+            Console.ReadKey();
+        }
+        static string GetAgeWord(int age)
+        {
+            if (age % 10 == 1 && age % 100 != 11) return "год";
+            if (age % 10 >= 2 && age % 10 <= 4 && (age % 100 < 10 || age % 100 >= 20)) return "года";
+            return "лет";
+        }
+    }
+}
