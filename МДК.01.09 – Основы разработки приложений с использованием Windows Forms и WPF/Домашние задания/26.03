@@ -1,0 +1,187 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        // Задание 1
+        Console.WriteLine("Задание 1:");
+        DrawSquare(4, '#');
+        
+        // Задание 2
+        Console.WriteLine("\nЗадание 2:");
+        Console.WriteLine($"1221 - палиндром? {IsPalindrome(1221)}");
+        Console.WriteLine($"1234 - палиндром? {IsPalindrome(1234)}");
+        
+        // Задание 3
+        Console.WriteLine("\nЗадание 3:");
+        int[] arr1 = { 1, 2, 6, -1, 88, 7, 6 };
+        int[] arr2 = { 6, 88, 7 };
+        int[] result = FilterArray(arr1, arr2);
+        Console.Write("Результат: ");
+        foreach (int num in result)
+            Console.Write(num + " ");
+        Console.WriteLine();
+    }
+    
+    // Задание 1: Рисуем квадрат
+    static void DrawSquare(int side, char symbol)
+    {
+        for (int i = 0; i < side; i++)
+        {
+            for (int j = 0; j < side; j++)
+                Console.Write(symbol);
+            Console.WriteLine();
+        }
+    }
+    
+    // Задание 2: Проверка на палиндром
+    static bool IsPalindrome(int number)
+    {
+        string str = number.ToString();
+        for (int i = 0; i < str.Length / 2; i++)
+        {
+            if (str[i] != str[str.Length - 1 - i])
+                return false;
+        }
+        return true;
+    }
+    
+    // Задание 3: Фильтрация массива
+    static int[] FilterArray(int[] original, int[] filter)
+    {
+        // Считаем сколько элементов нужно оставить
+        int count = 0;
+        for (int i = 0; i < original.Length; i++)
+        {
+            bool found = false;
+            for (int j = 0; j < filter.Length; j++)
+            {
+                if (original[i] == filter[j])
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+                count++;
+        }
+        
+        // Создаём новый массив
+        int[] result = new int[count];
+        int index = 0;
+        for (int i = 0; i < original.Length; i++)
+        {
+            bool found = false;
+            for (int j = 0; j < filter.Length; j++)
+            {
+                if (original[i] == filter[j])
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                result[index] = original[i];
+                index++;
+            }
+        }
+        return result;
+    }
+}
+
+// Задание 4: Класс Веб-сайт
+class Website
+{
+    public string name;
+    public string path;
+    public string description;
+    public string ipAddress;
+    
+    public void Input()
+    {
+        Console.Write("Название сайта: ");
+        name = Console.ReadLine();
+        Console.Write("Путь: ");
+        path = Console.ReadLine();
+        Console.Write("Описание: ");
+        description = Console.ReadLine();
+        Console.Write("IP адрес: ");
+        ipAddress = Console.ReadLine();
+    }
+    
+    public void Output()
+    {
+        Console.WriteLine($"Название: {name}");
+        Console.WriteLine($"Путь: {path}");
+        Console.WriteLine($"Описание: {description}");
+        Console.WriteLine($"IP: {ipAddress}");
+    }
+}
+
+// Задание 5: Класс Журнал
+class Journal
+{
+    public string name;
+    public int year;
+    public string description;
+    public string phone;
+    public string email;
+    
+    public void Input()
+    {
+        Console.Write("Название журнала: ");
+        name = Console.ReadLine();
+        Console.Write("Год основания: ");
+        year = int.Parse(Console.ReadLine());
+        Console.Write("Описание: ");
+        description = Console.ReadLine();
+        Console.Write("Телефон: ");
+        phone = Console.ReadLine();
+        Console.Write("Email: ");
+        email = Console.ReadLine();
+    }
+    
+    public void Output()
+    {
+        Console.WriteLine($"Название: {name}");
+        Console.WriteLine($"Год основания: {year}");
+        Console.WriteLine($"Описание: {description}");
+        Console.WriteLine($"Телефон: {phone}");
+        Console.WriteLine($"Email: {email}");
+    }
+}
+
+// Задание 6: Класс Магазин
+class Shop
+{
+    public string name;
+    public string address;
+    public string profile;
+    public string phone;
+    public string email;
+    
+    public void Input()
+    {
+        Console.Write("Название магазина: ");
+        name = Console.ReadLine();
+        Console.Write("Адрес: ");
+        address = Console.ReadLine();
+        Console.Write("Описание профиля: ");
+        profile = Console.ReadLine();
+        Console.Write("Телефон: ");
+        phone = Console.ReadLine();
+        Console.Write("Email: ");
+        email = Console.ReadLine();
+    }
+    
+    public void Output()
+    {
+        Console.WriteLine($"Название: {name}");
+        Console.WriteLine($"Адрес: {address}");
+        Console.WriteLine($"Профиль: {profile}");
+        Console.WriteLine($"Телефон: {phone}");
+        Console.WriteLine($"Email: {email}");
+    }
+}
